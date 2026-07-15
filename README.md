@@ -2,6 +2,10 @@
 
 一个可直接部署到 GitHub Pages 的纯静态单页 framing 实验。研究资料匿名提交到独立的 Google Apps Script Web App，并保存到 Google Sheet；抽奖联络资料不进入研究资料表。
 
+公开网址：<https://justine-sj.github.io/cup-choice-simulator/>
+
+社群贴文 QR Code：`cup-choice-simulator-qr.png`
+
 ## 本地测试
 
 在此目录运行：

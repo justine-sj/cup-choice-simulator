@@ -296,7 +296,7 @@
     <section id="submitting" class="panel hidden submit-state" aria-live="polite">
       <div class="spinner" aria-hidden="true"></div>
       <h2>正在匿名提交</h2>
-      <p class="lead">請不要關閉這個頁面。</p>
+      <p class="lead">請不要關閉這個頁面。提交時會短暫開啟 Google 傳送視窗，請允許彈出式視窗。</p>
     </section>
 
     <section id="submitError" class="panel hidden submit-state">
@@ -700,26 +700,18 @@
       }
 
       const nonce = randomId("n");
-      const body = new URLSearchParams({
-        payload: JSON.stringify(payload),
-        nonce
-      });
-
-      if (navigator.sendBeacon && navigator.sendBeacon(CONFIG.appsScriptUrl, body)) {
-        return new Promise(resolve => window.setTimeout(resolve, 5000));
-      }
-
       return new Promise((resolve, reject) => {
-        const iframe = document.createElement("iframe");
+        const targetName = "cup_submit_" + nonce;
+        const popup = window.open("about:blank", targetName, "popup,width=520,height=360");
+        if (!popup) {
+          reject(new Error("瀏覽器封鎖了提交視窗。請允許此網站開啟彈出式視窗後重試。"));
+          return;
+        }
+
         const form = document.createElement("form");
-        let settled = false;
-        let fallbackTimer;
-        let cleanupTimer;
-        iframe.name = "submit_" + nonce;
-        iframe.hidden = true;
         form.method = "POST";
         form.action = CONFIG.appsScriptUrl;
-        form.target = iframe.name;
+        form.target = targetName;
         form.hidden = true;
 
         const payloadInput = document.createElement("input");
@@ -729,39 +721,23 @@
         nonceInput.name = "nonce";
         nonceInput.value = nonce;
         form.append(payloadInput, nonceInput);
-        document.body.append(iframe, form);
-
-        const finish = (error) => {
-          if (settled) return;
-          settled = true;
-          window.removeEventListener("message", handleResponse);
-          window.clearTimeout(fallbackTimer);
-          if (error) reject(error);
-          else resolve();
-        };
-
-        const handleResponse = (event) => {
-          const data = event.data;
-          if (!data || data.type !== "cup-study-submission" || data.nonce !== nonce) return;
-          if (data.success) finish();
-          else finish(new Error(data.message || "研究資料未能寫入，請重新提交。"));
-        };
-
-        window.addEventListener("message", handleResponse);
+        document.body.append(form);
 
         try {
+          try {
+            popup.document.title = "正在提交研究資料";
+            popup.document.body.innerHTML = "<p style='font-family:sans-serif;padding:24px'>正在匿名提交，請稍候…</p>";
+          } catch { /* popup may already be navigating */ }
           form.submit();
           form.remove();
-
-          // Google Apps Script may take several seconds. Keep the target iframe
-          // alive so a slow request is not cancelled before the sheet is updated.
-          fallbackTimer = window.setTimeout(() => finish(), 8000);
-          cleanupTimer = window.setTimeout(() => iframe.remove(), 60000);
+          window.setTimeout(() => {
+            try { popup.close(); } catch { /* user may have closed it */ }
+            resolve();
+          }, 8000);
         } catch (error) {
-          window.clearTimeout(cleanupTimer);
           form.remove();
-          iframe.remove();
-          finish(error);
+          try { popup.close(); } catch { /* ignore */ }
+          reject(error);
         }
       });
     }

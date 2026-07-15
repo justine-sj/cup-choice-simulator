@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="一项关于台湾手摇饮杯型选择的匿名研究模拟器。">
+  <meta name="description" content="一項關於台灣手搖飲杯型選擇的匿名研究模擬器。">
   <meta name="theme-color" content="#315f4b">
-  <title>Cup Choice Simulator｜饮料杯选择模拟器</title>
+  <title>Cup Choice Simulator｜飲料杯選擇模擬器</title>
   <style>
     * { box-sizing: border-box; }
     :root {
@@ -15,7 +15,7 @@
       --paper: #fffdf8;
       --green: #315f4b;
       --green-dark: #244838;
-      --orange: #ef6b3a;
+      --orange: #d85e32;
       --gold: #f3dfad;
       --line: #ded3c6;
       --error: #a61b1b;
@@ -39,7 +39,7 @@
     }
     .shell { width: min(100% - 28px, 640px); margin: 0 auto; padding: 28px 0 48px; }
     .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
-    .brand { display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 900; }
+    .brand { display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 800; }
     .brand-mark {
       display: grid;
       width: 38px;
@@ -60,19 +60,31 @@
       box-shadow: 0 20px 60px rgba(75, 53, 34, .12);
     }
     .hidden { display: none !important; }
-    .fade { animation: fade-in .35s ease both; }
+    .fade { animation: fade-in .28s ease both; }
     @keyframes fade-in {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .eyebrow { margin: 0 0 13px; color: var(--orange); font-size: 11px; font-weight: 900; letter-spacing: .15em; }
-    h1, h2 { margin: 0; font-family: Georgia, "Noto Serif TC", serif; letter-spacing: -.035em; }
-    h1 { font-size: clamp(42px, 9vw, 64px); line-height: 1.05; }
-    h2 { font-size: clamp(30px, 7vw, 42px); line-height: 1.12; }
+    .eyebrow { margin: 0 0 13px; color: var(--orange); font-size: 11px; font-weight: 800; letter-spacing: .15em; }
+    h1, h2 { margin: 0; font-family: Georgia, "Noto Serif TC", serif; letter-spacing: -.025em; }
+    h1 { font-size: clamp(40px, 9vw, 62px); line-height: 1.08; }
+    h2 { font-size: clamp(28px, 7vw, 40px); line-height: 1.15; }
     .lead { margin: 24px 0; color: var(--muted); font-size: 16px; line-height: 1.8; }
     .info-box { margin: 24px 0; padding: 18px; background: #f4efe5; border-radius: 16px; }
     .info-box p { margin: 0 0 10px; line-height: 1.7; }
     .info-box p:last-child { margin-bottom: 0; }
+    .giveaway {
+      margin: 26px 0;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fffaf0;
+    }
+    .giveaway h2 { margin-bottom: 12px; font-size: 25px; }
+    .giveaway h3 { margin: 22px 0 8px; font-size: 17px; }
+    .giveaway p, .giveaway li { line-height: 1.7; }
+    .giveaway ol { margin: 8px 0 0; padding-left: 24px; }
+    .giveaway .steps { margin: 10px 0 0; padding-left: 20px; }
     .small { color: var(--muted); font-size: 13px; line-height: 1.65; }
     .consent {
       display: flex;
@@ -97,21 +109,50 @@
       align-items: center;
       color: #fff;
       background: var(--green);
-      font-weight: 850;
+      font-weight: 800;
       cursor: pointer;
       transition: transform .16s, background .16s;
+      text-decoration: none;
     }
     .button:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
-    .button:disabled { opacity: .45; cursor: not-allowed; }
-    .button.secondary { color: var(--ink); background: #eee6d8; }
+    .button:disabled, .button[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+    .button.secondary { color: var(--ink); background: #eee6d8; border: 1px solid #d8ccbd; }
     .button.secondary:hover:not(:disabled) { background: #e4dac8; }
     .button + .button { margin-top: 10px; }
     .progress-wrap { margin-bottom: 26px; }
     .progress-copy { display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--muted); font-size: 12px; }
     .progress-track { height: 8px; overflow: hidden; background: #e9e0d2; border-radius: 999px; }
     .progress-fill { width: 0; height: 100%; background: var(--orange); border-radius: inherit; transition: width .3s ease; }
+    .game-status {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .status-item { padding: 11px 6px; background: #f4efe5; border-radius: 12px; text-align: center; }
+    .status-item strong { display: block; margin-top: 4px; font-family: Georgia, serif; font-size: 20px; }
+    .status-item span { color: var(--muted); font-size: 10px; }
+    .scene-card { margin: 23px 0; }
+    .scene-number { margin: 0 0 8px; color: var(--orange); font-size: 11px; font-weight: 800; letter-spacing: .14em; }
+    .scene-card h2 { font-size: 30px; }
+    .scene-card p { margin: 14px 0 0; color: var(--muted); line-height: 1.75; white-space: pre-line; }
+    .framing-box {
+      margin: 20px 0;
+      padding: 18px;
+      border-left: 5px solid var(--orange);
+      background: #fff8e8;
+      border-radius: 6px 14px 14px 6px;
+      font-weight: 800;
+      line-height: 1.7;
+    }
+    .price-note { margin: 14px 0 20px; color: var(--muted); font-size: 13px; text-align: center; }
+    .limit-notice { margin: 18px 0; padding: 15px; color: #6c3c00; background: #fff0ca; border-radius: 14px; line-height: 1.65; }
+    .return-notice { margin: 18px 0; padding: 17px; background: #edf4f0; border-radius: 14px; line-height: 1.7; }
+    .effect-note { min-height: 22px; margin: 8px 0; color: var(--green); font-size: 13px; font-weight: 800; text-align: center; }
+    .choice-button { color: var(--ink); background: #f1eadf; border: 1px solid #d8ccbd; }
+    .choice-button:hover:not(:disabled) { background: #e7ddce; }
     fieldset { min-width: 0; margin: 24px 0; padding: 0; border: 0; }
-    legend { margin-bottom: 14px; font-weight: 850; line-height: 1.5; }
+    legend { margin-bottom: 14px; font-weight: 800; line-height: 1.5; }
     .radio-card {
       display: flex;
       gap: 10px;
@@ -125,45 +166,28 @@
     }
     .radio-card:has(input:checked) { border-color: var(--green); background: #edf4f0; }
     .radio-card input { margin-top: 3px; }
-    .feedback { min-height: 22px; margin: 10px 0; color: var(--error); font-size: 13px; font-weight: 750; }
-    .scene-card { margin: 23px 0; padding: 22px; background: #f5efe3; border-radius: 18px; }
-    .scene-number { margin: 0 0 8px; color: var(--orange); font-size: 11px; font-weight: 900; letter-spacing: .14em; }
-    .scene-card h2 { font-size: 29px; }
-    .scene-card p { margin: 13px 0 0; color: var(--muted); line-height: 1.75; }
-    .framing-box { margin: 18px 0; padding: 18px; border-left: 5px solid var(--orange); background: #fff8e8; border-radius: 6px 14px 14px 6px; font-weight: 800; line-height: 1.7; }
-    .price-note { margin: 14px 0 20px; color: var(--muted); font-size: 13px; text-align: center; }
-    .choice-button { color: var(--ink); background: #f1eadf; border: 1px solid #d8ccbd; }
-    .choice-button:hover:not(:disabled) { background: #e7ddce; }
-    .recorded {
-      display: grid;
-      min-height: 300px;
-      place-items: center;
-      text-align: center;
-    }
-    .recorded-mark { display: grid; width: 70px; height: 70px; margin: 0 auto 18px; place-items: center; color: #fff; background: var(--green); border-radius: 50%; font-size: 34px; }
+    .feedback { min-height: 22px; margin: 10px 0; color: var(--error); font-size: 13px; font-weight: 700; }
     .submit-state { text-align: center; }
     .spinner { width: 44px; height: 44px; margin: 0 auto 18px; border: 5px solid #e5dccc; border-top-color: var(--orange); border-radius: 50%; animation: spin .8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .proof {
-      position: relative;
-      margin: 24px 0;
-      padding: 30px;
-      overflow: hidden;
-      color: #fff;
-      background: var(--green);
-      border-radius: 22px;
-    }
+    .proof { position: relative; margin: 24px 0; padding: 28px; overflow: hidden; color: #fff; background: var(--green); border-radius: 22px; }
     .proof::after { content: "✓"; position: absolute; right: -10px; bottom: -65px; color: rgba(255,255,255,.08); font-family: Georgia, serif; font-size: 210px; }
-    .proof h2 { position: relative; z-index: 1; font-size: 42px; }
+    .proof h2 { position: relative; z-index: 1; font-size: 38px; }
     .proof-code { position: relative; z-index: 1; display: inline-flex; flex-direction: column; gap: 4px; margin-top: 24px; padding: 12px 16px; color: var(--ink); background: var(--gold); border-radius: 10px; }
-    .proof-code span { font-size: 10px; font-weight: 850; letter-spacing: .12em; }
+    .proof-code span { font-size: 10px; font-weight: 800; letter-spacing: .12em; }
     .proof-code strong { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 24px; letter-spacing: .12em; }
     .result-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
     .result-item { padding: 16px 10px; background: #f4efe5; border-radius: 13px; text-align: center; }
     .result-item strong { display: block; font-family: Georgia, serif; font-size: 26px; }
     .result-item span { color: var(--muted); font-size: 11px; }
+    .resource-results { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; }
+    .resource-result { padding: 14px; border: 1px solid var(--line); border-radius: 13px; }
+    .resource-result span { display: block; color: var(--muted); font-size: 11px; }
+    .resource-result strong { display: block; margin-top: 4px; font-family: Georgia, serif; font-size: 24px; }
+    .personality { margin: 20px 0; padding: 18px; background: #fff8e8; border-radius: 15px; text-align: center; }
+    .personality strong { display: block; font-family: Georgia, "Noto Serif TC", serif; font-size: 24px; }
     .debrief { margin-top: 20px; padding: 18px; background: #edf4f0; border-radius: 15px; line-height: 1.75; }
-    .test-badge { display: inline-block; margin-bottom: 14px; padding: 5px 9px; color: #7a4b00; background: #ffe4a8; border-radius: 999px; font-size: 11px; font-weight: 850; }
+    .test-badge { display: inline-block; margin-bottom: 14px; padding: 5px 9px; color: #7a4b00; background: #ffe4a8; border-radius: 999px; font-size: 11px; font-weight: 800; }
     .dev-note { margin-top: 18px; color: var(--muted); font-size: 12px; text-align: center; }
     @media (max-width: 480px) {
       .shell { width: min(100% - 18px, 640px); padding-top: 12px; }
@@ -171,9 +195,10 @@
       .panel { padding: 23px 18px; border-radius: 22px; }
       .result-list { gap: 6px; }
       .result-item { padding: 13px 5px; }
+      .game-status { grid-template-columns: repeat(2, 1fr); }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation: none !important; transition: none !important; }
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     }
   </style>
 </head>
@@ -181,53 +206,61 @@
   <main class="shell">
     <header class="topbar">
       <div class="brand"><span class="brand-mark">茶</span><span>Cup Choice Study</span></div>
-      <span class="version">STUDY V5</span>
+      <span class="version">STUDY V6</span>
     </header>
 
     <section id="intro" class="panel fade">
-      <span id="testBadge" class="test-badge hidden">本地测试模式</span>
-      <p class="eyebrow">ANONYMOUS RESEARCH · 匿名研究</p>
-      <h1>一杯饮料，<br>你会怎么选？</h1>
-      <p class="lead">这是一项关于台湾手摇饮杯型选择的学生专题研究。你将完成 5 个简短情境，约需 3 分钟。</p>
+      <span id="testBadge" class="test-badge hidden">本地測試模式</span>
+      <p class="eyebrow">GIVEAWAY × ANONYMOUS RESEARCH</p>
+      <h1>完成模擬器，<br>參加抽獎！</h1>
+      <p class="lead">這邊有一個專題研究關於台灣人在喝手搖飲上的習慣，以及推廣環保杯的使用率。只要完成以下步驟即可參加抽獎。</p>
+
+      <div class="giveaway">
+        <h2>獎品 Prize</h2>
+        <ol>
+          <li>idle 隨機專卡 ×2</li>
+          <li>Nmixx 迷5 Serenade ver. ×1（依然在預購中，能等待的朋友們再參加喔）</li>
+          <li>Babymonster 迷三 Ruka 單封 ×1</li>
+          <li>防風少年盲袋 ×1</li>
+          <li>藍色監獄 千切盲袋（相卡 ×2、徽章 ×3、紙片 ×3+）</li>
+          <li>Cortis 迷二電子專紅版 ×1</li>
+          <li>Babymonster 紅色毛球 ×1</li>
+        </ol>
+
+        <h3>如何參加抽獎？</h3>
+        <ul class="steps">
+          <li>完成模擬器，截圖最後的完成證明並留言告知自己要抽什麼。</li>
+          <li>轉發這則貼文，協助我們宣導環保杯的使用。</li>
+        </ul>
+
+        <h3>為何要使用環保杯？</h3>
+        <p>台灣人每年喝掉數十億杯手搖飲，但一杯手搖飲也會造成垃圾的增加。只要從今天開始願意帶環保杯，就能減少自然環境的破壞、資源浪費、焚化爐負擔，以及清潔人員的工作負擔。相信每個人小小的努力，可以一點一滴減少環境垃圾問題～</p>
+      </div>
+
+      <p class="lead"><strong>Simulator：</strong>你是一名學生，將在 Day 1–Day 7 管理錢包、時間、壓力與租借杯，並完成 7 次飲料選擇，約需 3–5 分鐘。</p>
       <div class="info-box">
-        <p><strong>研究会记录：</strong>实验组别、每轮杯型选择、反应时间及理解检查结果。</p>
-        <p><strong>研究不会记录：</strong>姓名、电话、电子邮件、社群帐号或抽奖联络资料。</p>
-        <p class="small">抽奖资格证明会在提交后于你的装置上产生，不会储存在研究资料表中，因此无法与个人联络资料配对。</p>
+        <p><strong>研究會記錄：</strong>實驗組別、每輪杯型選擇、反應時間、遊戲資源變化，以及最後的文字記憶題。</p>
+        <p><strong>研究不會記錄：</strong>姓名、電話、電子郵件、社群帳號或抽獎聯絡資料。</p>
+        <p class="small">抽獎聯絡資料請在獨立管道提供，不會與本研究資料放在同一份 Google Sheet。</p>
       </div>
       <label class="consent">
         <input id="consent" type="checkbox">
-        <span>我已阅读上述说明，并同意匿名参与本研究。<br><span class="small">I consent to participate anonymously.</span></span>
+        <span>我已閱讀上述說明，並同意匿名參與本研究。<br><span class="small">I consent to participate anonymously.</span></span>
       </label>
-      <button id="introNext" class="button" type="button" disabled>继续 Continue</button>
+      <a id="startStudy" class="button" href="#trial" aria-disabled="true">開始遊戲 Start Simulator</a>
       <p id="alreadyDone" class="feedback" role="alert"></p>
     </section>
 
-    <section id="rules" class="panel hidden">
+    <section id="trial" class="panel hidden" aria-live="polite">
       <div class="progress-wrap">
-        <div class="progress-copy"><span>规则说明</span><span>开始前</span></div>
-        <div class="progress-track"><div class="progress-fill" style="width:8%"></div></div>
+        <div class="progress-copy"><span id="trialProgress">情境 1 / 7</span><span id="progressPercent">14%</span></div>
+        <div class="progress-track" aria-hidden="true"><div id="progressFill" class="progress-fill"></div></div>
       </div>
-      <p class="eyebrow">RULES · 规则</p>
-      <h2>两种杯型，相同饮料</h2>
-      <div class="info-box">
-        <p>每个情境中，饮料本身完全相同，只有杯型与价格不同：</p>
-        <p><strong>自备环保杯：NT$65</strong><br><strong>一次性杯：NT$70</strong></p>
-        <p class="small">你也可以选择这次不购买。所有选择都没有正确或错误答案。</p>
-      </div>
-      <fieldset>
-        <legend>理解检查：两种杯型的价格分别是多少？</legend>
-        <label class="radio-card"><input type="radio" name="rule" value="wrong"><span>环保杯 NT$70；一次性杯 NT$65</span></label>
-        <label class="radio-card"><input type="radio" name="rule" value="correct"><span>环保杯 NT$65；一次性杯 NT$70</span></label>
-        <label class="radio-card"><input type="radio" name="rule" value="wrong"><span>两种杯型都是 NT$70</span></label>
-      </fieldset>
-      <p id="ruleFeedback" class="feedback" role="alert"></p>
-      <button id="startStudy" class="button" type="button">开始模拟器 Start</button>
-    </section>
-
-    <section id="trial" class="panel hidden">
-      <div class="progress-wrap">
-        <div class="progress-copy"><span id="trialProgress">情境 1 / 5</span><span id="progressPercent">20%</span></div>
-        <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+      <div class="game-status" aria-label="目前遊戲資源">
+        <div class="status-item"><span>💰 錢包</span><strong id="moneyStatus">500</strong></div>
+        <div class="status-item"><span>⏰ 時間</span><strong><span id="timeStatus">300</span> min</strong></div>
+        <div class="status-item"><span>♻ 未歸還杯</span><strong><span id="cupStatus">0</span> / 2</strong></div>
+        <div class="status-item"><span>😰 壓力</span><strong id="stressStatus">0</strong></div>
       </div>
       <div class="scene-card">
         <p id="sceneNumber" class="scene-number"></p>
@@ -235,104 +268,144 @@
         <p id="sceneText"></p>
       </div>
       <div id="framingText" class="framing-box"></div>
-      <p class="price-note">饮料内容相同｜环保杯 NT$65｜一次性杯 NT$70</p>
-      <button class="button choice-button" type="button" data-choice="reusable">自备环保杯 — NT$65</button>
-      <button class="button choice-button" type="button" data-choice="disposable">一次性杯 — NT$70</button>
-      <button class="button choice-button" type="button" data-choice="skip">这次不购买</button>
-    </section>
-
-    <section id="recorded" class="panel hidden recorded">
-      <div>
-        <div class="recorded-mark">✓</div>
-        <h2>选择已记录</h2>
-        <p class="small">正在进入下一个情境…</p>
-      </div>
+      <p id="priceNote" class="price-note">飲料內容相同｜租借杯 NT$65｜一次性杯 NT$70</p>
+      <div id="limitNotice" class="limit-notice hidden"></div>
+      <div id="returnNotice" class="return-notice hidden"></div>
+      <p id="effectNote" class="effect-note" aria-live="polite"></p>
+      <div id="choices"></div>
+      <p class="small" style="text-align:center">環保分將在最後結算時公布。</p>
     </section>
 
     <section id="check" class="panel hidden">
       <div class="progress-wrap">
-        <div class="progress-copy"><span>最后问题</span><span>100%</span></div>
-        <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
+        <div class="progress-copy"><span>最後一題</span><span>100%</span></div>
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill" style="width:100%"></div></div>
       </div>
-      <p class="eyebrow">FINAL CHECK · 最后检查</p>
-      <h2>你记得店员怎么说吗？</h2>
+      <p class="eyebrow">MANIPULATION CHECK · 文字記憶題</p>
+      <h2>你記得店員怎麼說嗎？</h2>
       <fieldset>
-        <legend>店员主要如何描述两种杯型的 NT$5 价格差异？</legend>
-        <label class="radio-card"><input type="radio" name="frame" value="GAIN"><span>选择环保杯可以省 NT$5</span></label>
-        <label class="radio-card"><input type="radio" name="frame" value="LOSS"><span>选择一次性杯需要多付 NT$5</span></label>
-        <label class="radio-card"><input type="radio" name="frame" value="DONT_REMEMBER"><span>不记得／不确定</span></label>
+        <legend>店員主要如何描述兩種杯型的 NT$5 價格差異？</legend>
+        <label class="radio-card"><input type="radio" name="frame" value="GAIN"><span>選擇租借杯可以省 NT$5</span></label>
+        <label class="radio-card"><input type="radio" name="frame" value="LOSS"><span>選擇一次性杯需要多付 NT$5</span></label>
+        <label class="radio-card"><input type="radio" name="frame" value="DONT_REMEMBER"><span>不記得／不確定</span></label>
       </fieldset>
       <p id="checkFeedback" class="feedback" role="alert"></p>
       <button id="submitStudy" class="button" type="button">匿名提交 Submit</button>
     </section>
 
-    <section id="submitting" class="panel hidden submit-state">
+    <section id="submitting" class="panel hidden submit-state" aria-live="polite">
       <div class="spinner" aria-hidden="true"></div>
       <h2>正在匿名提交</h2>
-      <p class="lead">请不要关闭这个页面。</p>
+      <p class="lead">請不要關閉這個頁面。</p>
     </section>
 
     <section id="submitError" class="panel hidden submit-state">
       <p class="eyebrow">SUBMISSION ERROR</p>
-      <h2>暂时无法提交</h2>
+      <h2>暫時無法提交</h2>
       <p id="submitErrorText" class="lead"></p>
       <button id="retrySubmit" class="button" type="button">重新提交 Retry</button>
     </section>
 
     <section id="result" class="panel hidden">
       <p class="eyebrow">COMPLETED · 已完成</p>
-      <h2>感谢你的参与！</h2>
+      <h2>感謝你的參與！</h2>
       <div class="proof">
         <p class="eyebrow" style="color:#c9dfd2">CUP CHOICE STUDY</p>
-        <h2>模拟器完成证明</h2>
-        <div class="proof-code"><span>抽奖资格代码</span><strong id="completionCode"></strong></div>
+        <h2>模擬器完成證明</h2>
+        <div class="proof-code"><span>抽獎截圖代碼</span><strong id="completionCode"></strong></div>
       </div>
-      <p class="small" style="text-align:center">请截图上方绿色卡片用于参加抽奖。资格代码只存在于你的装置中，不会写入研究资料。</p>
+      <p class="small" style="text-align:center">請截圖上方綠色卡片參加抽獎。此代碼只在你的裝置產生，不會傳送到研究資料表。</p>
       <div class="result-list">
-        <div class="result-item"><strong id="reuseResult">0</strong><span>环保杯</span></div>
+        <div class="result-item"><strong id="rentalResult">0</strong><span>租借杯</span></div>
         <div class="result-item"><strong id="disposeResult">0</strong><span>一次性杯</span></div>
-        <div class="result-item"><strong id="skipResult">0</strong><span>未购买</span></div>
+        <div class="result-item"><strong id="skipResult">0</strong><span>未購買</span></div>
+      </div>
+      <div id="personality" class="personality"></div>
+      <div class="resource-results">
+        <div class="resource-result"><span>💰 最終錢包</span><strong id="finalMoney">0</strong></div>
+        <div class="resource-result"><span>⏰ 最終時間</span><strong><span id="finalTime">0</span> min</strong></div>
+        <div class="resource-result"><span>🌱 最終環保分</span><strong id="finalEco">0</strong></div>
+        <div class="resource-result"><span>😰 最終壓力</span><strong id="finalStress">0</strong></div>
+        <div class="resource-result"><span>♻ 已歸還杯</span><strong id="finalReturned">0</strong></div>
+        <div class="resource-result"><span>⚠ 未歸還杯</span><strong id="finalOverdue">0</strong></div>
       </div>
       <div id="debrief" class="debrief"></div>
-      <button id="resetTest" class="button secondary hidden" type="button">重置本地测试</button>
+      <button id="resetTest" class="button secondary hidden" type="button">重置本地測試</button>
     </section>
 
-    <p class="dev-note">Global Link Student Research · Cup Choice Simulator V5</p>
+    <p class="dev-note">Global Link Student Research · Cup Choice Simulator V6</p>
   </main>
 
   <script>
     const CONFIG = {
-      studyVersion: "v5.0",
-      appsScriptUrl: "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL",
-      assignmentKey: "cupChoiceAssignmentV5",
-      completionKey: "cupChoiceCompletedV5"
+      studyVersion: "v6.0",
+      appsScriptUrl: "https://script.google.com/macros/s/AKfycbxl2oruNe4nDlJXUCuRLUj379VYkDQZxjRYtBSID_v5bK6ImLQ2P3v8B33QZO78Mgb1Rw/exec",
+      assignmentKey: "cupChoiceAssignmentV6",
+      completionKey: "cupChoiceCompletedV6"
     };
 
     const TEST_MODE = new URLSearchParams(location.search).get("test") === "1";
+    const MAX_RENTAL_CUPS = 2;
     const scenes = [
-      { id: "after_school", title: "放学以后", text: "今天天气很热。回家以前，你想买一杯饮料。" },
-      { id: "friend_invitation", title: "朋友邀请", text: "朋友问你要不要一起去饮料店。你正在考虑是否购买。" },
-      { id: "after_lunch", title: "午餐以后", text: "吃完午餐后，你经过一间饮料店，想买一杯饮料。" },
-      { id: "club_activity", title: "社团活动前", text: "社团活动开始前还有一点时间，你想先买一杯饮料。" },
-      { id: "weekend", title: "周末外出", text: "周末逛街时，你看到一间饮料店，考虑买一杯饮料。" }
+      {
+        id: "day1_after_school",
+        title: "After School Bubble Tea 放學後飲料時間",
+        text: "It’s really hot today. After school, you want a drink, but your reusable cup is at home.\n\n今天天氣很熱，放學後更想喝飲料，但環保杯在家。"
+      },
+      {
+        id: "day2_friend_invitation",
+        title: "Friend Invitation 朋友邀請",
+        text: "You are out with a friend. They suddenly buy a drink and invite you to join, but you did not bring a reusable cup.\n\n你和朋友出去玩，朋友突然買飲料並邀請你一起喝，但你沒有準備環保杯。"
+      },
+      {
+        id: "day3_midweek",
+        title: "Midweek Drink 週中飲料選擇",
+        text: "After handling any rental-cup return, you can decide whether to buy a drink today.\n\n處理完租借杯歸還後，你可以決定今天是否購買飲料。",
+        returnTitle: "Rental Cup Reminder 歸還提醒",
+        returnText: "Before buying today’s drink, check whether you have rental cups to return.\n\n購買今天的飲料前，先檢查是否有需要歸還的租借杯。"
+      },
+      {
+        id: "day4_weekend_shopping",
+        title: "Weekend Shopping 週末逛街",
+        text: "You spot a popular beverage shop while shopping and want a drink.\n\n逛街時，你看到一間最近很受歡迎的飲料店，想買一杯飲料。"
+      },
+      {
+        id: "day5_busy_afternoon",
+        title: "Busy Afternoon 忙碌下午",
+        text: "You are out shopping and see a beverage shop that recently went viral online.\n\n你在外面逛街，看到一間最近在網路上很紅的飲料店。"
+      },
+      {
+        id: "day6_important_gathering",
+        title: "Day 6 Drink 第六天飲料選擇",
+        text: "An important gathering is about to start, but you really want a drink. You are short on time and need to decide quickly.\n\n重要的聚會活動快開始了，但你很想喝飲料；時間有限，需要趕快決定。",
+        returnTitle: "Final Reminder 最後提醒",
+        returnText: "Before buying today’s drink, handle the final scheduled rental-cup reminder of the week.\n\n購買今天的飲料前，先處理本週最後一次租借杯歸還提醒。"
+      },
+      {
+        id: "day7_final_bubble_tea",
+        title: "Final Bubble Tea 最後一次選擇",
+        text: "After a hard week, you want to treat yourself to bubble tea, but you did not bring a reusable cup.\n\n辛苦一週後，想用一杯珍奶獎勵自己，但你又沒帶環保杯。"
+      }
     ];
 
     let participantId = "";
     let group = "";
     let trialIndex = 0;
     let trialStartedAt = 0;
-    let comprehensionAttempts = 0;
     let manipulationAnswer = "";
     let responses = [];
     let pendingPayload = null;
+    let submissionInProgress = false;
+    let game = {};
 
     const sections = [...document.querySelectorAll("main > section")];
     const consent = document.getElementById("consent");
-    const introNext = document.getElementById("introNext");
+    const startStudy = document.getElementById("startStudy");
+    const choices = document.getElementById("choices");
 
     function randomId(prefix = "p") {
       const bytes = new Uint8Array(12);
-      if (crypto && crypto.getRandomValues) crypto.getRandomValues(bytes);
+      if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(bytes);
       else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
       return prefix + "_" + [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
     }
@@ -349,156 +422,296 @@
     function showSection(id) {
       sections.forEach(section => section.classList.add("hidden"));
       const target = document.getElementById(id);
-      target.classList.remove("hidden");
-      target.classList.remove("fade");
+      target.classList.remove("hidden", "fade");
       void target.offsetWidth;
       target.classList.add("fade");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function initialize() {
-      if (TEST_MODE) document.getElementById("testBadge").classList.remove("hidden");
-      if (!TEST_MODE && safeRead(CONFIG.completionKey) === "true") {
-        consent.disabled = true;
-        introNext.disabled = true;
-        document.getElementById("alreadyDone").textContent = "此装置已经完成过研究。为避免重复资料，无法再次参加。";
-      }
-      consent.addEventListener("change", () => { introNext.disabled = !consent.checked; });
-    }
-
-    introNext.addEventListener("click", () => {
-      if (!consent.checked) return;
+    function createOrRestoreAssignment() {
       const saved = TEST_MODE ? null : safeRead(CONFIG.assignmentKey);
       if (saved) {
         try {
           const assignment = JSON.parse(saved);
           participantId = assignment.participantId;
           group = assignment.group;
-        } catch { /* create a new assignment below */ }
+        } catch { /* create a fresh assignment below */ }
       }
-      if (!participantId || !["GAIN", "LOSS"].includes(group)) {
+      if (!/^p_[a-f0-9]{24}$/.test(participantId) || !["GAIN", "LOSS"].includes(group)) {
         participantId = randomId();
         group = Math.random() < .5 ? "GAIN" : "LOSS";
         safeWrite(CONFIG.assignmentKey, JSON.stringify({ participantId, group }));
       }
-      showSection("rules");
-    });
+    }
 
-    document.getElementById("startStudy").addEventListener("click", () => {
-      const answer = document.querySelector('input[name="rule"]:checked');
-      comprehensionAttempts++;
-      if (!answer) {
-        document.getElementById("ruleFeedback").textContent = "请先选择答案。";
-        return;
-      }
-      if (answer.value !== "correct") {
-        document.getElementById("ruleFeedback").textContent = "答案不正确，请重新阅读价格后再试一次。";
-        return;
-      }
-      document.getElementById("ruleFeedback").textContent = "";
-      responses = [];
+    function resetGame() {
+      game = { money: 500, time: 300, eco: 0, stress: 0, rentalCups: 0, returned: 0 };
       trialIndex = 0;
+      responses = [];
+      updateStatus();
+    }
+
+    function updateStatus() {
+      document.getElementById("moneyStatus").textContent = game.money;
+      document.getElementById("timeStatus").textContent = game.time;
+      document.getElementById("cupStatus").textContent = game.rentalCups;
+      document.getElementById("stressStatus").textContent = game.stress;
+    }
+
+    function setStartAvailability() {
+      const unavailable = !consent.checked || (!TEST_MODE && safeRead(CONFIG.completionKey) === "true");
+      startStudy.setAttribute("aria-disabled", unavailable ? "true" : "false");
+    }
+
+    function initialize() {
+      if (TEST_MODE) document.getElementById("testBadge").classList.remove("hidden");
+      if (!TEST_MODE && safeRead(CONFIG.completionKey) === "true") {
+        consent.disabled = true;
+        document.getElementById("alreadyDone").textContent = "此裝置已完成過研究。為避免重複資料，無法再次參加。";
+      }
+      consent.addEventListener("change", setStartAvailability);
+      setStartAvailability();
+    }
+
+    startStudy.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (startStudy.getAttribute("aria-disabled") === "true") return;
+      createOrRestoreAssignment();
+      resetGame();
       renderTrial();
     });
 
     function renderTrial() {
+      if (trialIndex >= scenes.length) {
+        if (game.rentalCups > 0) renderFinalReturn();
+        else showSection("check");
+        return;
+      }
+
       const scene = scenes[trialIndex];
       const percent = Math.round(((trialIndex + 1) / scenes.length) * 100);
-      document.getElementById("trialProgress").textContent = `情境 ${trialIndex + 1} / ${scenes.length}`;
+      document.getElementById("trialProgress").textContent = `Day ${trialIndex + 1} / ${scenes.length}`;
       document.getElementById("progressPercent").textContent = `${percent}%`;
       document.getElementById("progressFill").style.width = `${percent}%`;
-      document.getElementById("sceneNumber").textContent = `SCENE ${String(trialIndex + 1).padStart(2, "0")}`;
-      document.getElementById("sceneTitle").textContent = scene.title;
-      document.getElementById("sceneText").textContent = scene.text;
-      document.getElementById("framingText").textContent = group === "GAIN"
-        ? "店员：使用自备环保杯可以省 NT$5。"
-        : "店员：使用一次性杯需要多付 NT$5。";
-      trialStartedAt = performance.now();
+      document.getElementById("sceneNumber").textContent = `DAY ${String(trialIndex + 1).padStart(2, "0")}`;
       showSection("trial");
+      if (scene.returnTitle && game.rentalCups > 0) renderScheduledReturn(scene);
+      else renderShop(scene);
     }
 
-    document.querySelectorAll("[data-choice]").forEach(button => {
-      button.addEventListener("click", () => {
-        const choice = button.dataset.choice;
-        responses.push({
-          scenarioId: scenes[trialIndex].id,
-          trial: trialIndex + 1,
-          choice,
-          responseTimeMs: Math.max(0, Math.round(performance.now() - trialStartedAt))
+    function clearTrialUi() {
+      choices.replaceChildren();
+      document.getElementById("limitNotice").classList.add("hidden");
+      document.getElementById("returnNotice").classList.add("hidden");
+      document.getElementById("effectNote").textContent = "";
+    }
+
+    function addChoice(label, handler) {
+      const button = document.createElement("button");
+      button.className = "button choice-button";
+      button.type = "button";
+      button.textContent = label;
+      button.addEventListener("click", handler, { once: true });
+      choices.appendChild(button);
+    }
+
+    function setScene(title, text) {
+      document.getElementById("sceneTitle").textContent = title;
+      document.getElementById("sceneText").textContent = text;
+    }
+
+    function renderShop(scene, effectText = "") {
+      clearTrialUi();
+      setScene(scene.title, scene.text);
+      const framingText = document.getElementById("framingText");
+      framingText.classList.remove("hidden");
+      framingText.textContent = group === "GAIN"
+        ? "店員：選擇租借杯可以省 NT$5。"
+        : "店員：選擇一次性杯需要多付 NT$5。";
+      document.getElementById("priceNote").classList.remove("hidden");
+      document.getElementById("effectNote").textContent = effectText;
+
+      if (game.rentalCups >= MAX_RENTAL_CUPS) {
+        const notice = document.getElementById("limitNotice");
+        notice.textContent = "⚠ 已借滿 2 個租借杯。請先歸還杯子，歸還後仍可在今天購買飲料。";
+        notice.classList.remove("hidden");
+        addChoice("♻ 歸還所有租借杯，再繼續購買", () => {
+          returnAllCups();
+          renderShop(scene, "已歸還杯子，可重新選擇今天的飲料。");
         });
-        showSection("recorded");
-        window.setTimeout(() => {
-          trialIndex++;
-          if (trialIndex < scenes.length) renderTrial();
-          else showSection("check");
-        }, TEST_MODE ? 80 : 520);
+      } else {
+        addChoice("♻ 租借杯 — NT$65", () => applyShopChoice("rental"));
+      }
+      addChoice("🥤 一次性杯 — NT$70", () => applyShopChoice("disposable"));
+      addChoice("❌ 這次不購買", () => applyShopChoice("skip"));
+      trialStartedAt = performance.now();
+      updateStatus();
+    }
+
+    function renderScheduledReturn(scene) {
+      clearTrialUi();
+      setScene(scene.returnTitle, scene.returnText);
+      document.getElementById("framingText").classList.add("hidden");
+      document.getElementById("priceNote").classList.add("hidden");
+      const notice = document.getElementById("returnNotice");
+      notice.textContent = `你目前有 ${game.rentalCups} 個租借杯尚未歸還。`;
+      notice.classList.remove("hidden");
+      addChoice("♻ 歸還所有租借杯，再購買今天的飲料", () => {
+        returnAllCups();
+        renderShop(scene, "租借杯已歸還。");
       });
-    });
+      addChoice("⏰ 稍後再還，先購買今天的飲料", () => {
+        game.stress += 5;
+        game.eco -= 2;
+        renderShop(scene, "選擇稍後歸還：壓力 +5。");
+      });
+      updateStatus();
+    }
+
+    function renderFinalReturn() {
+      showSection("trial");
+      document.getElementById("trialProgress").textContent = "Final / 結算前";
+      document.getElementById("progressPercent").textContent = "100%";
+      document.getElementById("progressFill").style.width = "100%";
+      document.getElementById("sceneNumber").textContent = "FINAL RETURN";
+      clearTrialUi();
+      setScene("Final Cup Return 最後歸還", "一週結束了。你手上仍有租借杯，可以在結算前選擇歸還。");
+      document.getElementById("framingText").classList.add("hidden");
+      document.getElementById("priceNote").classList.add("hidden");
+      const notice = document.getElementById("returnNotice");
+      notice.textContent = `你手上還有 ${game.rentalCups} 個租借杯尚未歸還。`;
+      notice.classList.remove("hidden");
+      addChoice("♻ 歸還所有租借杯並繼續", () => {
+        returnAllCups();
+        showSection("check");
+      });
+      addChoice("直接繼續，不歸還杯子", () => {
+        game.stress += game.rentalCups * 10;
+        game.eco -= game.rentalCups * 5;
+        showSection("check");
+      });
+      updateStatus();
+    }
+
+    function returnAllCups() {
+      if (game.rentalCups === 0) return;
+      game.returned += game.rentalCups;
+      game.eco += game.rentalCups * 5;
+      game.rentalCups = 0;
+      game.time -= 5;
+      updateStatus();
+    }
+
+    function applyShopChoice(choice) {
+      if (choice === "rental" && game.rentalCups >= MAX_RENTAL_CUPS) {
+        renderShop(scenes[trialIndex]);
+        return;
+      }
+      if (choice === "rental") {
+        game.money -= 65;
+        game.time -= 5;
+        game.eco += 10;
+        game.rentalCups += 1;
+      } else if (choice === "disposable") {
+        game.money -= 70;
+        game.eco -= 10;
+      } else {
+        game.time += 5;
+      }
+
+      responses.push({
+        scenarioId: scenes[trialIndex].id,
+        trial: trialIndex + 1,
+        choice,
+        responseTimeMs: Math.min(600000, Math.max(0, Math.round(performance.now() - trialStartedAt))),
+        moneyAfter: game.money,
+        timeAfter: game.time,
+        stressAfter: game.stress,
+        rentalCupsAfter: game.rentalCups,
+        ecoAfter: game.eco
+      });
+      trialIndex += 1;
+      renderTrial();
+    }
 
     document.getElementById("submitStudy").addEventListener("click", prepareSubmission);
     document.getElementById("retrySubmit").addEventListener("click", () => submitPayload(pendingPayload));
 
     function prepareSubmission() {
+      if (submissionInProgress) return;
       const answer = document.querySelector('input[name="frame"]:checked');
       if (!answer) {
-        document.getElementById("checkFeedback").textContent = "请先选择答案。";
+        document.getElementById("checkFeedback").textContent = "請先選擇答案。";
         return;
       }
       manipulationAnswer = answer.value;
-      const reusable = responses.filter(item => item.choice === "reusable").length;
-      const disposable = responses.filter(item => item.choice === "disposable").length;
-      const skipped = responses.filter(item => item.choice === "skip").length;
-      const purchased = reusable + disposable;
+      const responseSnapshot = responses.map(item => ({ ...item }));
+      if (responseSnapshot.length) {
+        responseSnapshot[responseSnapshot.length - 1].finalGameState = {
+          money: game.money,
+          time: game.time,
+          eco: game.eco,
+          stress: game.stress,
+          returned: game.returned,
+          overdue: game.rentalCups
+        };
+      }
+      const rental = responseSnapshot.filter(item => item.choice === "rental").length;
+      const disposable = responseSnapshot.filter(item => item.choice === "disposable").length;
+      const skipped = responseSnapshot.filter(item => item.choice === "skip").length;
+      const purchased = rental + disposable;
       pendingPayload = {
         studyVersion: CONFIG.studyVersion,
         sessionId: participantId,
         group,
         consentGiven: true,
-        completedNormally: responses.length === scenes.length,
-        comprehensionAttempts,
+        completedNormally: responseSnapshot.length === scenes.length,
         manipulationAnswer,
         manipulationCorrect: manipulationAnswer === group,
-        reusable,
+        rental,
         disposable,
         skipped,
-        reusableRate: purchased ? Math.round(reusable / purchased * 100) : 0,
-        responses
+        rentalRate: purchased ? Math.round(rental / purchased * 100) : 0,
+        responses: responseSnapshot
       };
       submitPayload(pendingPayload);
     }
 
     async function submitPayload(payload) {
+      if (!payload || submissionInProgress) return;
+      submissionInProgress = true;
       showSection("submitting");
       try {
-        if (TEST_MODE) {
-          await new Promise(resolve => setTimeout(resolve, 280));
-        } else {
-          await submitWithHiddenForm(payload);
-        }
+        if (TEST_MODE) await new Promise(resolve => setTimeout(resolve, 180));
+        else await submitWithAppsScript(payload);
         safeWrite(CONFIG.completionKey, "true");
         showResult(payload);
       } catch (error) {
-        document.getElementById("submitErrorText").textContent = error.message || "请检查网络后重新提交。";
+        document.getElementById("submitErrorText").textContent = error.message || "請檢查網路後重新提交。";
         showSection("submitError");
+      } finally {
+        submissionInProgress = false;
       }
     }
 
-    function submitWithHiddenForm(payload) {
+    function submitWithAppsScript(payload) {
+      if (!CONFIG.appsScriptUrl || CONFIG.appsScriptUrl.includes("PASTE_YOUR")) {
+        return Promise.reject(new Error("研究資料端點尚未連接。請先設定 Google Apps Script Web App URL。"));
+      }
       return new Promise((resolve, reject) => {
-        if (!CONFIG.appsScriptUrl || CONFIG.appsScriptUrl.includes("PASTE_YOUR")) {
-          reject(new Error("研究资料端点尚未连接。请先配置 Google Apps Script Web App URL。"));
-          return;
-        }
         const nonce = randomId("n");
-        const frameName = "submit_" + nonce.replace(/[^a-z0-9_]/gi, "");
         const iframe = document.createElement("iframe");
-        iframe.name = frameName;
-        iframe.hidden = true;
         const form = document.createElement("form");
+        let settled = false;
+        let fallbackTimer;
+        let cleanupTimer;
+        iframe.name = "submit_" + nonce;
+        iframe.hidden = true;
         form.method = "POST";
         form.action = CONFIG.appsScriptUrl;
-        form.target = frameName;
+        form.target = iframe.name;
         form.hidden = true;
+
         const payloadInput = document.createElement("input");
         payloadInput.name = "payload";
         payloadInput.value = JSON.stringify(payload);
@@ -508,43 +721,66 @@
         form.append(payloadInput, nonceInput);
         document.body.append(iframe, form);
 
-        let finished = false;
-        const cleanup = () => {
-          window.removeEventListener("message", onMessage);
+        const finish = (error) => {
+          if (settled) return;
+          settled = true;
+          window.removeEventListener("message", handleResponse);
+          window.clearTimeout(fallbackTimer);
+          if (error) reject(error);
+          else resolve();
+        };
+
+        const handleResponse = (event) => {
+          const data = event.data;
+          if (!data || data.type !== "cup-study-submission" || data.nonce !== nonce) return;
+          if (data.success) finish();
+          else finish(new Error(data.message || "研究資料未能寫入，請重新提交。"));
+        };
+
+        window.addEventListener("message", handleResponse);
+
+        try {
+          form.submit();
+          form.remove();
+
+          // Google Apps Script may take several seconds. Keep the target iframe
+          // alive so a slow request is not cancelled before the sheet is updated.
+          fallbackTimer = window.setTimeout(() => finish(), 8000);
+          cleanupTimer = window.setTimeout(() => iframe.remove(), 60000);
+        } catch (error) {
+          window.clearTimeout(cleanupTimer);
           form.remove();
           iframe.remove();
-        };
-        const finish = (callback) => {
-          if (finished) return;
-          finished = true;
-          window.clearTimeout(timer);
-          cleanup();
-          callback();
-        };
-        const onMessage = event => {
-          const allowedOrigin = event.origin === "https://script.google.com" || event.origin.endsWith(".googleusercontent.com");
-          if (!allowedOrigin || event.data?.type !== "cup-study-submission" || event.data?.nonce !== nonce) return;
-          if (event.data.success) finish(resolve);
-          else finish(() => reject(new Error(event.data.message || "资料提交失败。")));
-        };
-        const timer = window.setTimeout(() => finish(() => reject(new Error("提交等待时间过长，请检查网络后重试。"))), 20000);
-        window.addEventListener("message", onMessage);
-        form.submit();
+          finish(error);
+        }
       });
     }
 
     function showResult(payload) {
       const completionCode = randomId("").replace(/[^a-f0-9]/gi, "").slice(0, 8).toUpperCase();
+      const overdue = game.rentalCups;
+      const profile = payload.rentalRate >= 80 && overdue === 0
+        ? ["♻ Reusable Cup Champion", "你經常選擇租借杯，也完成了歸還責任。"]
+        : payload.rentalRate >= 40
+          ? ["🌱 Flexible Cup User", "你會在環保與便利之間作出平衡。"]
+          : ["⚡ Convenience-first User", "便利性是影響你選擇的重要因素。"];
       document.getElementById("completionCode").textContent = completionCode;
-      document.getElementById("reuseResult").textContent = payload.reusable;
+      document.getElementById("rentalResult").textContent = payload.rental;
       document.getElementById("disposeResult").textContent = payload.disposable;
       document.getElementById("skipResult").textContent = payload.skipped;
+      document.getElementById("personality").innerHTML = `<strong>${profile[0]}</strong><span class="small">${profile[1]}</span>`;
+      document.getElementById("finalMoney").textContent = game.money;
+      document.getElementById("finalTime").textContent = game.time;
+      document.getElementById("finalEco").textContent = game.eco;
+      document.getElementById("finalStress").textContent = game.stress;
+      document.getElementById("finalReturned").textContent = game.returned;
+      document.getElementById("finalOverdue").textContent = overdue;
       document.getElementById("debrief").innerHTML =
-        "<strong>实验说明</strong><br>" +
+        "<strong>實驗說明</strong><br>" +
         (group === "GAIN"
-          ? "你看到的是 GAIN 表达：环保杯可以省 NT$5。"
-          : "你看到的是 LOSS 表达：一次性杯需要多付 NT$5。") +
-        "<br><br>两组看到的价格和选项完全相同，研究比较不同文字表达是否影响杯型选择。你的选择没有正确或错误答案。";
+          ? "你看到的是 GAIN 表達：租借杯可以省 NT$5。"
+          : "你看到的是 LOSS 表達：一次性杯需要多付 NT$5。") +
+        "<br><br>兩組看到的 Day 1–Day 7 情境、價格、資源規則及選項完全相同，研究比較不同文字表達是否影響杯型選擇。環保分只在完成後顯示，所有選擇都沒有正確或錯誤答案。";
       if (TEST_MODE) document.getElementById("resetTest").classList.remove("hidden");
       showSection("result");
     }

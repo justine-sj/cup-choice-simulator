@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="一项关于台湾手摇饮杯型选择的匿名研究模拟器。">
+  <meta name="theme-color" content="#315f4b">
+  <title>Cup Choice Simulator｜饮料杯选择模拟器</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --ink: #2d231e;
+      --muted: #70645d;
+      --cream: #fbf6ea;
+      --paper: #fffdf8;
+      --green: #315f4b;
+      --green-dark: #244838;
+      --orange: #ef6b3a;
+      --gold: #f3dfad;
+      --line: #ded3c6;
+      --error: #a61b1b;
+    }
+    html { min-height: 100%; background: var(--cream); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 5%, rgba(243, 223, 173, .7), transparent 30%),
+        radial-gradient(circle at 90% 95%, rgba(49, 95, 75, .13), transparent 30%),
+        var(--cream);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+    }
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, input:focus-visible {
+      outline: 3px solid #f6b73c;
+      outline-offset: 3px;
+    }
+    .shell { width: min(100% - 28px, 640px); margin: 0 auto; padding: 28px 0 48px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+    .brand { display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 900; }
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      color: #fff;
+      background: var(--green);
+      border-radius: 50%;
+      font-family: Georgia, serif;
+      font-size: 19px;
+    }
+    .version { color: var(--muted); font-size: 11px; letter-spacing: .08em; }
+    .panel {
+      padding: clamp(24px, 5vw, 42px);
+      background: rgba(255, 253, 248, .96);
+      border: 1px solid rgba(45, 35, 30, .1);
+      border-radius: 28px;
+      box-shadow: 0 20px 60px rgba(75, 53, 34, .12);
+    }
+    .hidden { display: none !important; }
+    .fade { animation: fade-in .35s ease both; }
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .eyebrow { margin: 0 0 13px; color: var(--orange); font-size: 11px; font-weight: 900; letter-spacing: .15em; }
+    h1, h2 { margin: 0; font-family: Georgia, "Noto Serif TC", serif; letter-spacing: -.035em; }
+    h1 { font-size: clamp(42px, 9vw, 64px); line-height: 1.05; }
+    h2 { font-size: clamp(30px, 7vw, 42px); line-height: 1.12; }
+    .lead { margin: 24px 0; color: var(--muted); font-size: 16px; line-height: 1.8; }
+    .info-box { margin: 24px 0; padding: 18px; background: #f4efe5; border-radius: 16px; }
+    .info-box p { margin: 0 0 10px; line-height: 1.7; }
+    .info-box p:last-child { margin-bottom: 0; }
+    .small { color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .consent {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin: 22px 0;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      line-height: 1.55;
+      cursor: pointer;
+    }
+    .consent input { width: 20px; height: 20px; flex: 0 0 auto; margin-top: 2px; }
+    .button {
+      display: inline-flex;
+      width: 100%;
+      min-height: 54px;
+      padding: 14px 20px;
+      border: 0;
+      border-radius: 16px;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      background: var(--green);
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform .16s, background .16s;
+    }
+    .button:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
+    .button:disabled { opacity: .45; cursor: not-allowed; }
+    .button.secondary { color: var(--ink); background: #eee6d8; }
+    .button.secondary:hover:not(:disabled) { background: #e4dac8; }
+    .button + .button { margin-top: 10px; }
+    .progress-wrap { margin-bottom: 26px; }
+    .progress-copy { display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--muted); font-size: 12px; }
+    .progress-track { height: 8px; overflow: hidden; background: #e9e0d2; border-radius: 999px; }
+    .progress-fill { width: 0; height: 100%; background: var(--orange); border-radius: inherit; transition: width .3s ease; }
+    fieldset { min-width: 0; margin: 24px 0; padding: 0; border: 0; }
+    legend { margin-bottom: 14px; font-weight: 850; line-height: 1.5; }
+    .radio-card {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 10px 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      line-height: 1.5;
+      cursor: pointer;
+    }
+    .radio-card:has(input:checked) { border-color: var(--green); background: #edf4f0; }
+    .radio-card input { margin-top: 3px; }
+    .feedback { min-height: 22px; margin: 10px 0; color: var(--error); font-size: 13px; font-weight: 750; }
+    .scene-card { margin: 23px 0; padding: 22px; background: #f5efe3; border-radius: 18px; }
+    .scene-number { margin: 0 0 8px; color: var(--orange); font-size: 11px; font-weight: 900; letter-spacing: .14em; }
+    .scene-card h2 { font-size: 29px; }
+    .scene-card p { margin: 13px 0 0; color: var(--muted); line-height: 1.75; }
+    .framing-box { margin: 18px 0; padding: 18px; border-left: 5px solid var(--orange); background: #fff8e8; border-radius: 6px 14px 14px 6px; font-weight: 800; line-height: 1.7; }
+    .price-note { margin: 14px 0 20px; color: var(--muted); font-size: 13px; text-align: center; }
+    .choice-button { color: var(--ink); background: #f1eadf; border: 1px solid #d8ccbd; }
+    .choice-button:hover:not(:disabled) { background: #e7ddce; }
+    .recorded {
+      display: grid;
+      min-height: 300px;
+      place-items: center;
+      text-align: center;
+    }
+    .recorded-mark { display: grid; width: 70px; height: 70px; margin: 0 auto 18px; place-items: center; color: #fff; background: var(--green); border-radius: 50%; font-size: 34px; }
+    .submit-state { text-align: center; }
+    .spinner { width: 44px; height: 44px; margin: 0 auto 18px; border: 5px solid #e5dccc; border-top-color: var(--orange); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .proof {
+      position: relative;
+      margin: 24px 0;
+      padding: 30px;
+      overflow: hidden;
+      color: #fff;
+      background: var(--green);
+      border-radius: 22px;
+    }
+    .proof::after { content: "✓"; position: absolute; right: -10px; bottom: -65px; color: rgba(255,255,255,.08); font-family: Georgia, serif; font-size: 210px; }
+    .proof h2 { position: relative; z-index: 1; font-size: 42px; }
+    .proof-code { position: relative; z-index: 1; display: inline-flex; flex-direction: column; gap: 4px; margin-top: 24px; padding: 12px 16px; color: var(--ink); background: var(--gold); border-radius: 10px; }
+    .proof-code span { font-size: 10px; font-weight: 850; letter-spacing: .12em; }
+    .proof-code strong { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 24px; letter-spacing: .12em; }
+    .result-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+    .result-item { padding: 16px 10px; background: #f4efe5; border-radius: 13px; text-align: center; }
+    .result-item strong { display: block; font-family: Georgia, serif; font-size: 26px; }
+    .result-item span { color: var(--muted); font-size: 11px; }
+    .debrief { margin-top: 20px; padding: 18px; background: #edf4f0; border-radius: 15px; line-height: 1.75; }
+    .test-badge { display: inline-block; margin-bottom: 14px; padding: 5px 9px; color: #7a4b00; background: #ffe4a8; border-radius: 999px; font-size: 11px; font-weight: 850; }
+    .dev-note { margin-top: 18px; color: var(--muted); font-size: 12px; text-align: center; }
+    @media (max-width: 480px) {
+      .shell { width: min(100% - 18px, 640px); padding-top: 12px; }
+      .topbar { padding: 0 5px; margin-bottom: 12px; }
+      .panel { padding: 23px 18px; border-radius: 22px; }
+      .result-list { gap: 6px; }
+      .result-item { padding: 13px 5px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">茶</span><span>Cup Choice Study</span></div>
+      <span class="version">STUDY V5</span>
+    </header>
+
+    <section id="intro" class="panel fade">
+      <span id="testBadge" class="test-badge hidden">本地测试模式</span>
+      <p class="eyebrow">ANONYMOUS RESEARCH · 匿名研究</p>
+      <h1>一杯饮料，<br>你会怎么选？</h1>
+      <p class="lead">这是一项关于台湾手摇饮杯型选择的学生专题研究。你将完成 5 个简短情境，约需 3 分钟。</p>
+      <div class="info-box">
+        <p><strong>研究会记录：</strong>实验组别、每轮杯型选择、反应时间及理解检查结果。</p>
+        <p><strong>研究不会记录：</strong>姓名、电话、电子邮件、社群帐号或抽奖联络资料。</p>
+        <p class="small">抽奖资格证明会在提交后于你的装置上产生，不会储存在研究资料表中，因此无法与个人联络资料配对。</p>
+      </div>
+      <label class="consent">
+        <input id="consent" type="checkbox">
+        <span>我已阅读上述说明，并同意匿名参与本研究。<br><span class="small">I consent to participate anonymously.</span></span>
+      </label>
+      <button id="introNext" class="button" type="button" disabled>继续 Continue</button>
+      <p id="alreadyDone" class="feedback" role="alert"></p>
+    </section>
+
+    <section id="rules" class="panel hidden">
+      <div class="progress-wrap">
+        <div class="progress-copy"><span>规则说明</span><span>开始前</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:8%"></div></div>
+      </div>
+      <p class="eyebrow">RULES · 规则</p>
+      <h2>两种杯型，相同饮料</h2>
+      <div class="info-box">
+        <p>每个情境中，饮料本身完全相同，只有杯型与价格不同：</p>
+        <p><strong>自备环保杯：NT$65</strong><br><strong>一次性杯：NT$70</strong></p>
+        <p class="small">你也可以选择这次不购买。所有选择都没有正确或错误答案。</p>
+      </div>
+      <fieldset>
+        <legend>理解检查：两种杯型的价格分别是多少？</legend>
+        <label class="radio-card"><input type="radio" name="rule" value="wrong"><span>环保杯 NT$70；一次性杯 NT$65</span></label>
+        <label class="radio-card"><input type="radio" name="rule" value="correct"><span>环保杯 NT$65；一次性杯 NT$70</span></label>
+        <label class="radio-card"><input type="radio" name="rule" value="wrong"><span>两种杯型都是 NT$70</span></label>
+      </fieldset>
+      <p id="ruleFeedback" class="feedback" role="alert"></p>
+      <button id="startStudy" class="button" type="button">开始模拟器 Start</button>
+    </section>
+
+    <section id="trial" class="panel hidden">
+      <div class="progress-wrap">
+        <div class="progress-copy"><span id="trialProgress">情境 1 / 5</span><span id="progressPercent">20%</span></div>
+        <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+      </div>
+      <div class="scene-card">
+        <p id="sceneNumber" class="scene-number"></p>
+        <h2 id="sceneTitle"></h2>
+        <p id="sceneText"></p>
+      </div>
+      <div id="framingText" class="framing-box"></div>
+      <p class="price-note">饮料内容相同｜环保杯 NT$65｜一次性杯 NT$70</p>
+      <button class="button choice-button" type="button" data-choice="reusable">自备环保杯 — NT$65</button>
+      <button class="button choice-button" type="button" data-choice="disposable">一次性杯 — NT$70</button>
+      <button class="button choice-button" type="button" data-choice="skip">这次不购买</button>
+    </section>
+
+    <section id="recorded" class="panel hidden recorded">
+      <div>
+        <div class="recorded-mark">✓</div>
+        <h2>选择已记录</h2>
+        <p class="small">正在进入下一个情境…</p>
+      </div>
+    </section>
+
+    <section id="check" class="panel hidden">
+      <div class="progress-wrap">
+        <div class="progress-copy"><span>最后问题</span><span>100%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
+      </div>
+      <p class="eyebrow">FINAL CHECK · 最后检查</p>
+      <h2>你记得店员怎么说吗？</h2>
+      <fieldset>
+        <legend>店员主要如何描述两种杯型的 NT$5 价格差异？</legend>
+        <label class="radio-card"><input type="radio" name="frame" value="GAIN"><span>选择环保杯可以省 NT$5</span></label>
+        <label class="radio-card"><input type="radio" name="frame" value="LOSS"><span>选择一次性杯需要多付 NT$5</span></label>
+        <label class="radio-card"><input type="radio" name="frame" value="DONT_REMEMBER"><span>不记得／不确定</span></label>
+      </fieldset>
+      <p id="checkFeedback" class="feedback" role="alert"></p>
+      <button id="submitStudy" class="button" type="button">匿名提交 Submit</button>
+    </section>
+
+    <section id="submitting" class="panel hidden submit-state">
+      <div class="spinner" aria-hidden="true"></div>
+      <h2>正在匿名提交</h2>
+      <p class="lead">请不要关闭这个页面。</p>
+    </section>
+
+    <section id="submitError" class="panel hidden submit-state">
+      <p class="eyebrow">SUBMISSION ERROR</p>
+      <h2>暂时无法提交</h2>
+      <p id="submitErrorText" class="lead"></p>
+      <button id="retrySubmit" class="button" type="button">重新提交 Retry</button>
+    </section>
+
+    <section id="result" class="panel hidden">
+      <p class="eyebrow">COMPLETED · 已完成</p>
+      <h2>感谢你的参与！</h2>
+      <div class="proof">
+        <p class="eyebrow" style="color:#c9dfd2">CUP CHOICE STUDY</p>
+        <h2>模拟器完成证明</h2>
+        <div class="proof-code"><span>抽奖资格代码</span><strong id="completionCode"></strong></div>
+      </div>
+      <p class="small" style="text-align:center">请截图上方绿色卡片用于参加抽奖。资格代码只存在于你的装置中，不会写入研究资料。</p>
+      <div class="result-list">
+        <div class="result-item"><strong id="reuseResult">0</strong><span>环保杯</span></div>
+        <div class="result-item"><strong id="disposeResult">0</strong><span>一次性杯</span></div>
+        <div class="result-item"><strong id="skipResult">0</strong><span>未购买</span></div>
+      </div>
+      <div id="debrief" class="debrief"></div>
+      <button id="resetTest" class="button secondary hidden" type="button">重置本地测试</button>
+    </section>
+
+    <p class="dev-note">Global Link Student Research · Cup Choice Simulator V5</p>
+  </main>
+
+  <script>
+    const CONFIG = {
+      studyVersion: "v5.0",
+      appsScriptUrl: "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL",
+      assignmentKey: "cupChoiceAssignmentV5",
+      completionKey: "cupChoiceCompletedV5"
+    };
+
+    const TEST_MODE = new URLSearchParams(location.search).get("test") === "1";
+    const scenes = [
+      { id: "after_school", title: "放学以后", text: "今天天气很热。回家以前，你想买一杯饮料。" },
+      { id: "friend_invitation", title: "朋友邀请", text: "朋友问你要不要一起去饮料店。你正在考虑是否购买。" },
+      { id: "after_lunch", title: "午餐以后", text: "吃完午餐后，你经过一间饮料店，想买一杯饮料。" },
+      { id: "club_activity", title: "社团活动前", text: "社团活动开始前还有一点时间，你想先买一杯饮料。" },
+      { id: "weekend", title: "周末外出", text: "周末逛街时，你看到一间饮料店，考虑买一杯饮料。" }
+    ];
+
+    let participantId = "";
+    let group = "";
+    let trialIndex = 0;
+    let trialStartedAt = 0;
+    let comprehensionAttempts = 0;
+    let manipulationAnswer = "";
+    let responses = [];
+    let pendingPayload = null;
+
+    const sections = [...document.querySelectorAll("main > section")];
+    const consent = document.getElementById("consent");
+    const introNext = document.getElementById("introNext");
+
+    function randomId(prefix = "p") {
+      const bytes = new Uint8Array(12);
+      if (crypto && crypto.getRandomValues) crypto.getRandomValues(bytes);
+      else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+      return prefix + "_" + [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
+    }
+
+    function safeRead(key) {
+      try { return localStorage.getItem(key); } catch { return null; }
+    }
+
+    function safeWrite(key, value) {
+      if (TEST_MODE) return;
+      try { localStorage.setItem(key, value); } catch { /* storage may be unavailable */ }
+    }
+
+    function showSection(id) {
+      sections.forEach(section => section.classList.add("hidden"));
+      const target = document.getElementById(id);
+      target.classList.remove("hidden");
+      target.classList.remove("fade");
+      void target.offsetWidth;
+      target.classList.add("fade");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function initialize() {
+      if (TEST_MODE) document.getElementById("testBadge").classList.remove("hidden");
+      if (!TEST_MODE && safeRead(CONFIG.completionKey) === "true") {
+        consent.disabled = true;
+        introNext.disabled = true;
+        document.getElementById("alreadyDone").textContent = "此装置已经完成过研究。为避免重复资料，无法再次参加。";
+      }
+      consent.addEventListener("change", () => { introNext.disabled = !consent.checked; });
+    }
+
+    introNext.addEventListener("click", () => {
+      if (!consent.checked) return;
+      const saved = TEST_MODE ? null : safeRead(CONFIG.assignmentKey);
+      if (saved) {
+        try {
+          const assignment = JSON.parse(saved);
+          participantId = assignment.participantId;
+          group = assignment.group;
+        } catch { /* create a new assignment below */ }
+      }
+      if (!participantId || !["GAIN", "LOSS"].includes(group)) {
+        participantId = randomId();
+        group = Math.random() < .5 ? "GAIN" : "LOSS";
+        safeWrite(CONFIG.assignmentKey, JSON.stringify({ participantId, group }));
+      }
+      showSection("rules");
+    });
+
+    document.getElementById("startStudy").addEventListener("click", () => {
+      const answer = document.querySelector('input[name="rule"]:checked');
+      comprehensionAttempts++;
+      if (!answer) {
+        document.getElementById("ruleFeedback").textContent = "请先选择答案。";
+        return;
+      }
+      if (answer.value !== "correct") {
+        document.getElementById("ruleFeedback").textContent = "答案不正确，请重新阅读价格后再试一次。";
+        return;
+      }
+      document.getElementById("ruleFeedback").textContent = "";
+      responses = [];
+      trialIndex = 0;
+      renderTrial();
+    });
+
+    function renderTrial() {
+      const scene = scenes[trialIndex];
+      const percent = Math.round(((trialIndex + 1) / scenes.length) * 100);
+      document.getElementById("trialProgress").textContent = `情境 ${trialIndex + 1} / ${scenes.length}`;
+      document.getElementById("progressPercent").textContent = `${percent}%`;
+      document.getElementById("progressFill").style.width = `${percent}%`;
+      document.getElementById("sceneNumber").textContent = `SCENE ${String(trialIndex + 1).padStart(2, "0")}`;
+      document.getElementById("sceneTitle").textContent = scene.title;
+      document.getElementById("sceneText").textContent = scene.text;
+      document.getElementById("framingText").textContent = group === "GAIN"
+        ? "店员：使用自备环保杯可以省 NT$5。"
+        : "店员：使用一次性杯需要多付 NT$5。";
+      trialStartedAt = performance.now();
+      showSection("trial");
+    }
+
+    document.querySelectorAll("[data-choice]").forEach(button => {
+      button.addEventListener("click", () => {
+        const choice = button.dataset.choice;
+        responses.push({
+          scenarioId: scenes[trialIndex].id,
+          trial: trialIndex + 1,
+          choice,
+          responseTimeMs: Math.max(0, Math.round(performance.now() - trialStartedAt))
+        });
+        showSection("recorded");
+        window.setTimeout(() => {
+          trialIndex++;
+          if (trialIndex < scenes.length) renderTrial();
+          else showSection("check");
+        }, TEST_MODE ? 80 : 520);
+      });
+    });
+
+    document.getElementById("submitStudy").addEventListener("click", prepareSubmission);
+    document.getElementById("retrySubmit").addEventListener("click", () => submitPayload(pendingPayload));
+
+    function prepareSubmission() {
+      const answer = document.querySelector('input[name="frame"]:checked');
+      if (!answer) {
+        document.getElementById("checkFeedback").textContent = "请先选择答案。";
+        return;
+      }
+      manipulationAnswer = answer.value;
+      const reusable = responses.filter(item => item.choice === "reusable").length;
+      const disposable = responses.filter(item => item.choice === "disposable").length;
+      const skipped = responses.filter(item => item.choice === "skip").length;
+      const purchased = reusable + disposable;
+      pendingPayload = {
+        studyVersion: CONFIG.studyVersion,
+        sessionId: participantId,
+        group,
+        consentGiven: true,
+        completedNormally: responses.length === scenes.length,
+        comprehensionAttempts,
+        manipulationAnswer,
+        manipulationCorrect: manipulationAnswer === group,
+        reusable,
+        disposable,
+        skipped,
+        reusableRate: purchased ? Math.round(reusable / purchased * 100) : 0,
+        responses
+      };
+      submitPayload(pendingPayload);
+    }
+
+    async function submitPayload(payload) {
+      showSection("submitting");
+      try {
+        if (TEST_MODE) {
+          await new Promise(resolve => setTimeout(resolve, 280));
+        } else {
+          await submitWithHiddenForm(payload);
+        }
+        safeWrite(CONFIG.completionKey, "true");
+        showResult(payload);
+      } catch (error) {
+        document.getElementById("submitErrorText").textContent = error.message || "请检查网络后重新提交。";
+        showSection("submitError");
+      }
+    }
+
+    function submitWithHiddenForm(payload) {
+      return new Promise((resolve, reject) => {
+        if (!CONFIG.appsScriptUrl || CONFIG.appsScriptUrl.includes("PASTE_YOUR")) {
+          reject(new Error("研究资料端点尚未连接。请先配置 Google Apps Script Web App URL。"));
+          return;
+        }
+        const nonce = randomId("n");
+        const frameName = "submit_" + nonce.replace(/[^a-z0-9_]/gi, "");
+        const iframe = document.createElement("iframe");
+        iframe.name = frameName;
+        iframe.hidden = true;
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = CONFIG.appsScriptUrl;
+        form.target = frameName;
+        form.hidden = true;
+        const payloadInput = document.createElement("input");
+        payloadInput.name = "payload";
+        payloadInput.value = JSON.stringify(payload);
+        const nonceInput = document.createElement("input");
+        nonceInput.name = "nonce";
+        nonceInput.value = nonce;
+        form.append(payloadInput, nonceInput);
+        document.body.append(iframe, form);
+
+        let finished = false;
+        const cleanup = () => {
+          window.removeEventListener("message", onMessage);
+          form.remove();
+          iframe.remove();
+        };
+        const finish = (callback) => {
+          if (finished) return;
+          finished = true;
+          window.clearTimeout(timer);
+          cleanup();
+          callback();
+        };
+        const onMessage = event => {
+          const allowedOrigin = event.origin === "https://script.google.com" || event.origin.endsWith(".googleusercontent.com");
+          if (!allowedOrigin || event.data?.type !== "cup-study-submission" || event.data?.nonce !== nonce) return;
+          if (event.data.success) finish(resolve);
+          else finish(() => reject(new Error(event.data.message || "资料提交失败。")));
+        };
+        const timer = window.setTimeout(() => finish(() => reject(new Error("提交等待时间过长，请检查网络后重试。"))), 20000);
+        window.addEventListener("message", onMessage);
+        form.submit();
+      });
+    }
+
+    function showResult(payload) {
+      const completionCode = randomId("").replace(/[^a-f0-9]/gi, "").slice(0, 8).toUpperCase();
+      document.getElementById("completionCode").textContent = completionCode;
+      document.getElementById("reuseResult").textContent = payload.reusable;
+      document.getElementById("disposeResult").textContent = payload.disposable;
+      document.getElementById("skipResult").textContent = payload.skipped;
+      document.getElementById("debrief").innerHTML =
+        "<strong>实验说明</strong><br>" +
+        (group === "GAIN"
+          ? "你看到的是 GAIN 表达：环保杯可以省 NT$5。"
+          : "你看到的是 LOSS 表达：一次性杯需要多付 NT$5。") +
+        "<br><br>两组看到的价格和选项完全相同，研究比较不同文字表达是否影响杯型选择。你的选择没有正确或错误答案。";
+      if (TEST_MODE) document.getElementById("resetTest").classList.remove("hidden");
+      showSection("result");
+    }
+
+    document.getElementById("resetTest").addEventListener("click", () => location.reload());
+    initialize();
+  </script>
+</body>
+</html>

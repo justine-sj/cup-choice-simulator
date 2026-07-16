@@ -296,7 +296,7 @@
     <section id="submitting" class="panel hidden submit-state" aria-live="polite">
       <div class="spinner" aria-hidden="true"></div>
       <h2>正在匿名提交</h2>
-      <p class="lead">請不要關閉這個頁面。提交時會短暫開啟 Google 傳送視窗，請允許彈出式視窗。</p>
+      <p class="lead">請不要關閉這個頁面，資料正在匿名傳送。</p>
     </section>
 
     <section id="submitError" class="panel hidden submit-state">
@@ -701,44 +701,31 @@
 
       const nonce = randomId("n");
       return new Promise((resolve, reject) => {
-        const targetName = "cup_submit_" + nonce;
-        const popup = window.open("about:blank", targetName, "popup,width=520,height=360");
-        if (!popup) {
-          reject(new Error("瀏覽器封鎖了提交視窗。請允許此網站開啟彈出式視窗後重試。"));
+        const requestUrl = new URL(CONFIG.appsScriptUrl);
+        requestUrl.searchParams.set("payload", JSON.stringify(payload));
+        requestUrl.searchParams.set("nonce", nonce);
+        requestUrl.searchParams.set("cache", Date.now().toString());
+        if (requestUrl.href.length > 7500) {
+          reject(new Error("研究資料內容過長，暫時無法提交。"));
           return;
         }
 
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = CONFIG.appsScriptUrl;
-        form.target = targetName;
-        form.hidden = true;
-
-        const payloadInput = document.createElement("input");
-        payloadInput.name = "payload";
-        payloadInput.value = JSON.stringify(payload);
-        const nonceInput = document.createElement("input");
-        nonceInput.name = "nonce";
-        nonceInput.value = nonce;
-        form.append(payloadInput, nonceInput);
-        document.body.append(form);
-
-        try {
-          try {
-            popup.document.title = "正在提交研究資料";
-            popup.document.body.innerHTML = "<p style='font-family:sans-serif;padding:24px'>正在匿名提交，請稍候…</p>";
-          } catch { /* popup may already be navigating */ }
-          form.submit();
-          form.remove();
-          window.setTimeout(() => {
-            try { popup.close(); } catch { /* user may have closed it */ }
-            resolve();
-          }, 8000);
-        } catch (error) {
-          form.remove();
-          try { popup.close(); } catch { /* ignore */ }
-          reject(error);
-        }
+        const beaconImage = new Image();
+        let settled = false;
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          window.clearTimeout(timeout);
+          beaconImage.remove();
+          resolve();
+        };
+        const timeout = window.setTimeout(finish, 12000);
+        beaconImage.hidden = true;
+        beaconImage.alt = "";
+        beaconImage.addEventListener("load", finish, { once: true });
+        beaconImage.addEventListener("error", finish, { once: true });
+        document.body.append(beaconImage);
+        beaconImage.src = requestUrl.href;
       });
     }
 
